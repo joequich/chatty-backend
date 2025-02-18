@@ -7,4 +7,8 @@ const app: Application = express();
 app.use(morgan('dev'));
 app.use(cors(require('./cors')));
 
+app.get('/', (req, res) => {
+  res.send('my-api');
+});
+
 export default app;
