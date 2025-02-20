@@ -1,5 +1,5 @@
 {
-  "name": "chat-app-server",
+  "name": "chatty-server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,7 +12,6 @@
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "prepare": "husky",
     "check": "biome check --write",
     "format": "biome format --write"
   },
