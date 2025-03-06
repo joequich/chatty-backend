@@ -2,6 +2,8 @@ name: chatty
 services:
   postgres:
     image: postgres:17.3
+    volumes:
+      - /data/postgres:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
@@ -10,6 +12,8 @@ services:
       - docker.env
   pgadmin:
     image: dpage/pgadmin4:9.0
+    volumes:
+      - /data/pgadmin:/root/var/lib/pgadmin
     ports:
       - "8080:80"
     networks:
@@ -19,7 +23,12 @@ services:
     depends_on:
       - postgres
   backend:
-    image: chatty-backend:1.0
+    build:
+      context: .
+      target: dev-deps
+    command: pnpm dev
+    volumes:
+      - ./src:/app/src
     ports:
       - "3000:3000"
     networks:
