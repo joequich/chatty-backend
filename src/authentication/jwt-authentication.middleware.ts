@@ -7,26 +7,26 @@ export class JwtAuthenticationMiddleware {
     const authHeader = req.headers.authorization;
     const authParts = authHeader?.split(' ');
 
-    if (authParts && authParts.length === 2) {
-      const [type, credential] = authParts;
-
-      if (!type?.startsWith('Bearer')) {
-        res.status(401).json({
-          message: 'Bad format of authorization',
-        });
-      }
-
-      try {
-        res.locals.jwt = jwt.verify(credential, env.jwt.accessSecretKey);
-        return next();
-      } catch (error) {
-        res.status(403).json({
-          message: 'Access denied',
-        });
-      }
-    } else {
+    if (authParts?.length !== 2) {
       res.status(401).json({
         message: 'No authorization token was found',
+      });
+      return;
+    }
+
+    const [type, credential] = authParts;
+    if (type !== 'Bearer') {
+      res.status(401).json({
+        message: 'Bad format of authorization',
+      });
+      return;
+    }
+    try {
+      res.locals.jwt = jwt.verify(credential, env.jwt.accessSecretKey);
+      return next();
+    } catch (error) {
+      res.status(403).json({
+        message: 'Access denied',
       });
     }
   }

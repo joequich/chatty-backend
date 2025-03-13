@@ -34,12 +34,12 @@ export class UserService {
   }
 
   async getByEmail(email: string) {
-    const user = await this.db.query.usersTable.findFirst({ where: eq(databaseSchema.usersTable.email, email) });
-
-    if (!user) {
-      throw new Error('User not found');
+    try {
+      const user = await this.db.query.usersTable.findFirst({ where: eq(databaseSchema.usersTable.email, email) });
+      return user;
+    } catch {
+      throw new Error('Some error while reading user email credencial');
     }
-    return user;
   }
 
   async create(user: CreateUserDto) {

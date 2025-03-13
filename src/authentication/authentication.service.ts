@@ -9,6 +9,21 @@ import type { JwtPayload } from './interfaces/jwt.interface';
 export class AuthenticationService {
   constructor(private readonly userService: UserService) {}
 
+  private async getUserByEmail(email: string) {
+    const user = await this.userService.getByEmail(email);
+    if (!user) {
+      throw new Error('Wrong credentials');
+    }
+    return user;
+  }
+
+  private async verifyUserPassword(password: string, hashedPassword: string) {
+    const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
+    if (!isPasswordCorrect) {
+      throw new Error('Wrong credentials');
+    }
+  }
+
   async signUp({ email, password }: SignUpDto) {
     const hashedPassword = await bcrypt.hash(password, env.saltRounds);
     return this.userService.create({
@@ -17,29 +32,14 @@ export class AuthenticationService {
     });
   }
 
-  async verifyUserPassword(password: string, hashedPassword: string) {
-    const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
-    if (!isPasswordCorrect) {
-      throw new Error('Wrong credentials');
-    }
-  }
-
-  private async getUserByEmail(email: string) {
-    try {
-      return await this.userService.getByEmail(email);
-    } catch (error) {
-      throw new Error('Wrong credentials');
-    }
-  }
-
   async getAuthenticatedUser(signInData: SignInDto) {
     const user = await this.getUserByEmail(signInData.email);
     await this.verifyUserPassword(signInData.password, user.password);
     return user;
   }
 
-  getJwtTokens(userId: number) {
-    const payload: JwtPayload = { userId };
+  getJwtTokens(userId: number, email: string) {
+    const payload: JwtPayload = { userId, email };
     const accessToken = jwt.sign(payload, env.jwt.accessSecretKey, {
       expiresIn: env.jwt.accessExpirationTime,
     } as SignOptions);

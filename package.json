@@ -22,6 +22,7 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.39.3",
@@ -35,6 +36,7 @@
     "@biomejs/biome": "1.9.4",
     "@types/bcrypt": "^5.0.2",
     "@types/body-parser": "^1.19.5",
+    "@types/cookie-parser": "^1.4.8",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.9",

@@ -10,8 +10,8 @@ export class AuthenticationController {
   }
 
   async signIn(req: Request, res: Response) {
-    const user = await this.authenticationService.getAuthenticatedUser(req.body);
-    const { accessToken, refreshTokenExpiration, refreshToken } = this.authenticationService.getJwtTokens(user.id);
+    const { username, id, email } = await this.authenticationService.getAuthenticatedUser(req.body);
+    const { accessToken, refreshTokenExpiration, refreshToken } = this.authenticationService.getJwtTokens(id, email);
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -19,6 +19,13 @@ export class AuthenticationController {
       maxAge: refreshTokenExpiration,
       sameSite: 'strict',
     });
-    res.status(201).json({ username: user.username, accessToken });
+    res.status(201).json({ username, accessToken });
+  }
+
+  async refreshToken(req: Request, res: Response) {
+    const { username, id, email } = req.body;
+    const { accessToken } = this.authenticationService.getJwtTokens(id, email);
+
+    res.status(201).json({ username, accessToken });
   }
 }
