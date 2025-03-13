@@ -1,16 +1,9 @@
 import http from 'node:http';
-import { config } from 'dotenv';
-import minimist from 'minimist';
 import app from './app';
+import env from './env.config';
 
-const { env } = minimist(process.argv.slice(2));
 const server = http.createServer(app);
-
-config({
-  path: `./.env${env ? `.${env}` : ''}`,
-});
-
-const port = process.env.PORT || 3000;
+const port = env.PORT;
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);

@@ -1,7 +1,7 @@
 import { type NodePgDatabase, drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import env from '../env.config';
 import { databaseSchema } from './database.schema';
-import 'dotenv/config';
 
 export class DrizzleService {
   private static instance: DrizzleService;
@@ -10,7 +10,7 @@ export class DrizzleService {
 
   private constructor() {
     try {
-      this.pool = new Pool({ connectionString: process.env.DATABASE_URL });
+      this.pool = new Pool({ connectionString: env.DB_URL });
 
       this.pool.on('error', (err) => {
         console.error('Database connection error:', err.message);
