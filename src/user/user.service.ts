@@ -13,16 +13,16 @@ export class UserService {
   }
 
   private async generateUniqueUsername() {
-    const username = generateRandomString(10);
-    const isUnique = false;
+    let username = '';
+    let isUnique = false;
 
-    if (!isUnique) {
-      const usernameFounded = await this.db
-        .select()
-        .from(databaseSchema.usersTable)
-        .where(eq(databaseSchema.usersTable.username, username));
-      if (usernameFounded.length === 0) {
-        return username;
+    while (!isUnique) {
+      username = generateRandomString(10);
+      const usernameFounded = await this.db.query.usersTable.findFirst({
+        where: eq(databaseSchema.usersTable.username, username),
+      });
+      if (!usernameFounded) {
+        isUnique = true;
       }
     }
 
@@ -31,6 +31,15 @@ export class UserService {
 
   async getAll() {
     return await this.db.select().from(databaseSchema.usersTable);
+  }
+
+  async getByEmail(email: string) {
+    const user = await this.db.query.usersTable.findFirst({ where: eq(databaseSchema.usersTable.email, email) });
+
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
   }
 
   async create(user: CreateUserDto) {

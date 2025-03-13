@@ -12,16 +12,17 @@ if (envFound.error) {
 }
 
 export default {
-  NODE_ENV: env,
-  PORT: Number.parseInt(process.env.PORT ? process.env.PORT : '', 10),
-  DB_URL: process.env.DATABASE_URL || '',
-  API: {
+  nodeDev: env,
+  saltRounds: 10,
+  port: Number.parseInt(process.env.PORT ? process.env.PORT : '', 10),
+  dbUrl: process.env.DATABASE_URL || '',
+  api: {
     prefix: '/api',
   },
-  JWT: {
-    ACCESS_SECRET_KEY: process.env.JWT_ACCESS_SECRET_KEY,
-    ACCESS_EXPIRATION_TIME: process.env.JWT_ACCESS_EXPIRATION_TIME,
-    REFRESH_SECRET_KEY: process.env.JWT_REFRESH_SECRET_KEY,
-    REFRESH_EXPIRATION_TIME: process.env.JWT_REFRESH_EXPIRATION_TIME,
+  jwt: {
+    accessSecretKey: process.env.JWT_ACCESS_SECRET_KEY || '',
+    accessExpirationTime: process.env.JWT_ACCESS_EXPIRATION_TIME || '',
+    refreshSecretKey: process.env.JWT_REFRESH_SECRET_KEY || '',
+    refreshExpirationTime: process.env.JWT_REFRESH_EXPIRATION_TIME || '',
   },
 };

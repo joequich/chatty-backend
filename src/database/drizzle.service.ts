@@ -10,7 +10,7 @@ export class DrizzleService {
 
   private constructor() {
     try {
-      this.pool = new Pool({ connectionString: env.DB_URL });
+      this.pool = new Pool({ connectionString: env.dbUrl });
 
       this.pool.on('error', (err) => {
         console.error('Database connection error:', err.message);
