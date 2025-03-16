@@ -7,21 +7,9 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - backend
+      - private
     env_file:
       - docker.env
-  pgadmin:
-    image: dpage/pgadmin4:9.0
-    volumes:
-      - /data/pgadmin:/root/var/lib/pgadmin
-    ports:
-      - "8080:80"
-    networks:
-      - backend
-    env_file:
-      - docker.env
-    depends_on:
-      - postgres
   backend:
     build:
       context: .
@@ -32,11 +20,11 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - backend
+      - private
     env_file:
       - .env
     depends_on:
       - postgres
 networks:
-  backend:
+  private:
     driver: bridge

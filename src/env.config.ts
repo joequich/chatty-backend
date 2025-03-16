@@ -18,6 +18,7 @@ export default {
   dbUrl: process.env.DATABASE_URL || '',
   api: {
     prefix: '/api',
+    version: process.env.API_VERSION || 'v0',
   },
   jwt: {
     accessSecretKey: process.env.JWT_ACCESS_SECRET_KEY || '',
