@@ -1,6 +1,6 @@
 import { type NodePgDatabase, drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import env from '../env.config';
+import env from '../common/config/env.config';
 import { databaseSchema } from './database.schema';
 
 export class DrizzleService {

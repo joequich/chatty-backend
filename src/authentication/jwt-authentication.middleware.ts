@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import env from '../env.config';
+import env from '../common/config/env.config';
 
 export class JwtAuthenticationMiddleware {
   validateJwt(req: Request, res: Response, next: NextFunction) {

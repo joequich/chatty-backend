@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt, { type SignOptions } from 'jsonwebtoken';
+import env from '../common/config/env.config';
 import type { SignInDto } from '../dto/sign-in-dto';
 import type { SignUpDto } from '../dto/sign-up.dto';
-import env from '../env.config';
 import type { UserService } from '../user/user.service';
+import { HttpException } from '../utils/http-exception';
 import type { JwtPayload } from './interfaces/jwt.interface';
 
 export class AuthenticationService {
@@ -12,7 +13,7 @@ export class AuthenticationService {
   private async getUserByEmail(email: string) {
     const user = await this.userService.getByEmail(email);
     if (!user) {
-      throw new Error('Wrong credentials');
+      throw new HttpException(401, 'Wrong credentials');
     }
     return user;
   }
@@ -20,7 +21,7 @@ export class AuthenticationService {
   private async verifyUserPassword(password: string, hashedPassword: string) {
     const isPasswordCorrect = await bcrypt.compare(password, hashedPassword);
     if (!isPasswordCorrect) {
-      throw new Error('Wrong credentials');
+      throw new HttpException(401, 'Wrong credentials');
     }
   }
 

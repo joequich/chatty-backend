@@ -11,10 +11,8 @@ const authenticationService = new AuthenticationService(userService);
 const authenticationController = new AuthenticationController(authenticationService);
 const jwtMiddleware = new JwtRefreshAuthenticationMiddleware(userService);
 
-router.post('/sign-up', (req, res) => authenticationController.signUp(req, res));
-router.post('/sign-in', (req, res) => authenticationController.signIn(req, res));
-router.post('/refresh', jwtMiddleware.validateRefreshToken, (req, res) =>
-  authenticationController.refreshToken(req, res),
-);
+router.post('/sign-up', authenticationController.signUp);
+router.post('/sign-in', authenticationController.signIn);
+router.post('/refresh', jwtMiddleware.validateRefreshToken, authenticationController.refreshToken);
 
 export default router;

@@ -4,7 +4,7 @@ import minimist from 'minimist';
 
 const { env } = minimist(process.argv.slice(2));
 
-const pathFile = path.resolve(__dirname, `../.env${env ? `.${env}` : ''}`);
+const pathFile = path.resolve(__dirname, `../../../.env${env ? `.${env}` : ''}`);
 const envFound = config({ path: pathFile });
 
 if (envFound.error) {
@@ -12,7 +12,7 @@ if (envFound.error) {
 }
 
 export default {
-  nodeDev: env,
+  nodeEnv: process.env.NODE_ENV || 'dev',
   saltRounds: 10,
   port: Number.parseInt(process.env.PORT ? process.env.PORT : '', 10),
   dbUrl: process.env.DATABASE_URL || '',

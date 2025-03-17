@@ -10,7 +10,7 @@ const userService = new UserService();
 const userController = new UserController(userService);
 const jwtMiddleware = new JwtAuthenticationMiddleware();
 
-router.get('/', jwtMiddleware.validateJwt, (req, res) => userController.getAll(req, res));
+router.get('/', jwtMiddleware.validateJwt, userController.getAll);
 
 // mocks
 router.get('/me', jwtMiddleware.validateJwt, (req, res) => {
