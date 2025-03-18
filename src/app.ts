@@ -5,7 +5,7 @@ import express, { type Application } from 'express';
 import morgan from 'morgan';
 import corsConfig from './common/config/cors.config';
 import env from './common/config/env.config';
-import errorHandler from './common/errors/error-handler';
+import { errorHandler } from './common/middlewares/error-handler.middleware';
 import routes from './routes';
 
 const app: Application = express();

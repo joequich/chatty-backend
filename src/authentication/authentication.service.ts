@@ -1,11 +1,10 @@
 import bcrypt from 'bcrypt';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import env from '../common/config/env.config';
-import type { SignInDto } from '../dto/sign-in-dto';
-import type { SignUpDto } from '../dto/sign-up.dto';
 import type { UserService } from '../user/user.service';
 import { HttpException } from '../utils/http-exception';
 import type { JwtPayload } from './interfaces/jwt.interface';
+import type { SignInDto, SignUpDto } from './schemas/authentication.dto';
 
 export class AuthenticationService {
   constructor(private readonly userService: UserService) {}

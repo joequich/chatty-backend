@@ -26,6 +26,9 @@ importers:
       drizzle-orm:
         specifier: ^0.39.3
         version: 0.39.3(@types/pg@8.11.11)(pg@8.13.3)
+      drizzle-zod:
+        specifier: ^0.7.0
+        version: 0.7.0(drizzle-orm@0.39.3(@types/pg@8.11.11)(pg@8.13.3))(zod@3.24.2)
       express:
         specifier: ^4.21.2
         version: 4.21.2
@@ -41,6 +44,9 @@ importers:
       pg:
         specifier: ^8.13.3
         version: 8.13.3
+      zod:
+        specifier: ^3.24.2
+        version: 3.24.2
     devDependencies:
       '@biomejs/biome':
         specifier: 1.9.4
@@ -817,6 +823,12 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  drizzle-zod@0.7.0:
+    resolution: {integrity: sha512-xgCRYYVEzRkeXTS33GSMgoowe3vKsMNBjSI+cwG1oLQVEhAWWbqtb/AAMlm7tkmV4fG/uJjEmWzdzlEmTgWOoQ==}
+    peerDependencies:
+      drizzle-orm: '>=0.36.0'
+      zod: '>=3.0.0'
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -1617,6 +1629,9 @@ packages:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}
     engines: {node: '>=6'}
 
+  zod@3.24.2:
+    resolution: {integrity: sha512-lY7CDW43ECgW9u1TcT3IoXHflywfVqDYze4waEz812jR/bZ8FHDsl7pFQoSZTz5N+2NqRXs8GBwnAwo3ZNxqhQ==}
+
 snapshots:
 
   '@biomejs/biome@1.9.4':
@@ -2117,6 +2132,11 @@ snapshots:
     optionalDependencies:
       '@types/pg': 8.11.11
       pg: 8.13.3
+
+  drizzle-zod@0.7.0(drizzle-orm@0.39.3(@types/pg@8.11.11)(pg@8.13.3))(zod@3.24.2):
+    dependencies:
+      drizzle-orm: 0.39.3(@types/pg@8.11.11)(pg@8.13.3)
+      zod: 3.24.2
 
   dunder-proto@1.0.1:
     dependencies:
@@ -2966,3 +2986,5 @@ snapshots:
   yaml@2.7.0: {}
 
   yn@3.1.1: {}
+
+  zod@3.24.2: {}

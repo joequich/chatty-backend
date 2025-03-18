@@ -1,9 +1,9 @@
 import { eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { databaseSchema } from '../database/database.schema';
+import { type databaseSchema, usersTable } from '../database/database.schema';
 import { DrizzleService } from '../database/drizzle.service';
-import type { CreateUserDto } from '../dto/user.dto';
 import { generateRandomString } from '../utils/generate-random';
+import type { CreateUserDto } from './schemas/user.dto';
 
 export class UserService {
   private db: NodePgDatabase<typeof databaseSchema>;
@@ -19,7 +19,7 @@ export class UserService {
     while (!isUnique) {
       username = generateRandomString(10);
       const usernameFounded = await this.db.query.usersTable.findFirst({
-        where: eq(databaseSchema.usersTable.username, username),
+        where: eq(usersTable.username, username),
       });
       if (!usernameFounded) {
         isUnique = true;
@@ -30,12 +30,12 @@ export class UserService {
   }
 
   async getAll() {
-    return await this.db.select().from(databaseSchema.usersTable);
+    return await this.db.select().from(usersTable);
   }
 
   async getByEmail(email: string) {
     try {
-      const user = await this.db.query.usersTable.findFirst({ where: eq(databaseSchema.usersTable.email, email) });
+      const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.email, email) });
       return user;
     } catch {
       throw new Error('Some error while reading user email credencial');
@@ -46,12 +46,12 @@ export class UserService {
     try {
       const username = await this.generateUniqueUsername();
       const createdUser = await this.db
-        .insert(databaseSchema.usersTable)
+        .insert(usersTable)
         .values({
           ...user,
           username,
         })
-        .returning();
+        .returning({ username: usersTable.username, email: usersTable.email });
       return createdUser.pop();
     } catch (error) {
       console.log(error);
