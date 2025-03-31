@@ -33,6 +33,15 @@ export class UserService {
     return await this.db.select().from(usersTable);
   }
 
+  async getById(id: number) {
+    try {
+      const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.id, id) });
+      return user;
+    } catch {
+      throw new Error('Some error while reading user by id');
+    }
+  }
+
   async getByEmail(email: string) {
     try {
       const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.email, email) });

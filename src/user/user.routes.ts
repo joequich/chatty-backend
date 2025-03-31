@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { JwtAuthenticationMiddleware } from '../authentication/jwt-authentication.middleware';
-import { resolveMockFilePath } from '../utils/resolve-mock-file-path';
+import { AuthenticationMiddleware } from '../authentication/authentication.middleware';
+import { AuthenticationService } from '../authentication/authentication.service';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 
@@ -8,13 +8,9 @@ const router = Router();
 
 const userService = new UserService();
 const userController = new UserController(userService);
-const jwtMiddleware = new JwtAuthenticationMiddleware();
+const authService = new AuthenticationService(userService);
+const authMiddleware = new AuthenticationMiddleware(authService);
 
-router.get('/', jwtMiddleware.validateJwt, userController.getAll);
-
-// mocks
-router.get('/me', jwtMiddleware.validateJwt, (req, res) => {
-  res.status(200).sendFile(resolveMockFilePath(__dirname, 'user-me-mock.json'));
-});
+router.get('/me', authMiddleware.validateJwt, userController.getById);
 
 export default router;

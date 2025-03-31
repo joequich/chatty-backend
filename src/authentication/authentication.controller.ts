@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
+import env from '../common/config/env.config';
 import type { AuthenticationService } from './authentication.service';
 
 export class AuthenticationController {
@@ -15,16 +16,17 @@ export class AuthenticationController {
 
   signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { username, id, email } = await this.authenticationService.getAuthenticatedUser(req.body);
-      const { accessToken, refreshTokenExpiration, refreshToken } = this.authenticationService.getJwtTokens(id, email);
+      const { id, email, username } = await this.authenticationService.getAuthenticatedUser(req.body);
+      const { refreshTokenExpiration, refreshToken } = await this.authenticationService.createRefreshToken(id, email);
+      const { accessToken } = this.authenticationService.createAccessToken(id, email);
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        path: '/',
         maxAge: refreshTokenExpiration,
         sameSite: 'strict',
+        // secure: env.nodeEnv === 'production'
       });
-      res.status(201).json({ username, accessToken });
+      res.status(201).json({ success: true, data: { access_token: accessToken, user: { id, email, username } } });
     } catch (error) {
       next(error);
     }
@@ -32,10 +34,38 @@ export class AuthenticationController {
 
   refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { username, id, email } = req.body;
-      const { accessToken } = this.authenticationService.getJwtTokens(id, email);
+      const currentRefreshToken = req.cookies?.refreshToken;
+      const { userId, email, username } = req.body.user;
+      const { refreshTokenExpiration, refreshToken } = await this.authenticationService.createRefreshToken(
+        userId,
+        email,
+        currentRefreshToken,
+      );
+      const { accessToken } = this.authenticationService.createAccessToken(userId, email);
 
-      res.status(201).json({ username, accessToken });
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        maxAge: refreshTokenExpiration,
+        sameSite: 'strict',
+        // secure: env.nodeEnv === 'production'
+      });
+      res.status(201).json({ success: true, data: { access_token: accessToken } });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  signOut = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const refreshToken = req.cookies.refreshToken;
+
+      if (refreshToken) {
+        await this.authenticationService.killToken(refreshToken);
+      }
+
+      res.clearCookie('refreshToken');
+
+      res.status(201).json({ success: true });
     } catch (error) {
       next(error);
     }
