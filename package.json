@@ -1,8 +1,13 @@
 {
-  "name": "chatty-server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "chat-server",
+  "version": "0.1.0",
+  "author": "Joseph Quispe",
+  "license": "MIT",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joequich/chat-server.git"
+  },
   "engines": {
     "node": "^22.13.1",
     "pnpm": "^10.3.0"
@@ -15,10 +20,6 @@
     "check": "biome check --write",
     "format": "biome format --write"
   },
-  "keywords": [],
-  "author": "Joseph Quispe",
-  "license": "UNLICENSED",
-  "private": true,
   "dependencies": {
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
