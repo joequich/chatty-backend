@@ -6,7 +6,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/joequich/chatty-server.git"
+    "url": "https://github.com/joequich/chatty-backend.git"
   },
   "engines": {
     "node": "^22.13.1",
