@@ -7,3 +7,5 @@ Dockerfile
 .DS_Store
 .vscode
 dist
+.env*
+*.env
