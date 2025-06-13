@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { config } from 'dotenv';
 import minimist from 'minimist';
@@ -5,20 +6,25 @@ import minimist from 'minimist';
 const { env } = minimist(process.argv.slice(2));
 
 const pathFile = path.resolve(__dirname, `../../../.env${env ? `.${env}` : ''}`);
-const envFound = config({ path: pathFile });
 
-if (envFound.error) {
-  throw new Error("Couldn't find .env file");
+if (fs.existsSync(pathFile)) {
+  const envFound = config({ path: pathFile });
+
+  if (envFound.error) {
+    throw new Error(`Error loading env file at ${pathFile}`);
+  }
+} else {
+  console.warn(`Couldn't find .env file at ${pathFile}. process.env will be used directly.`);
 }
 
 export default {
-  nodeEnv: process.env.NODE_ENV || 'dev',
+  nodeEnv: process.env.NODE_ENV || 'development',
   saltRounds: 10,
   port: Number.parseInt(process.env.PORT ? process.env.PORT : '', 10),
   dbUrl: process.env.DATABASE_URL || '',
   api: {
     prefix: '/api',
-    version: process.env.API_VERSION || 'v0',
+    version: process.env.API_VERSION || 'v1',
   },
   jwt: {
     accessSecretKey: process.env.JWT_ACCESS_SECRET_KEY || '',
