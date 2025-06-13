@@ -1,7 +1,9 @@
 node_modules
-dist
+npm-debug.log
+Dockerfile
+.dockerignore
 .git
 .gitignore
-Dockerfile
-docker-compose.yml
-*.md
+.DS_Store
+.vscode
+dist
