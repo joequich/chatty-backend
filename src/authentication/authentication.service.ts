@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import jwt, { type SignOptions } from 'jsonwebtoken';
 import env from '../common/config/env.config';
-import { type databaseSchema, refreshTokensTable } from '../database/database.schema';
+import { type databaseSchema, usersSessionsTable } from '../database/database.schema';
 import { DrizzleService } from '../database/drizzle.service';
 import type { UserService } from '../user/user.service';
 import { HttpException } from '../utils/http-exception';
@@ -32,7 +32,7 @@ export class AuthenticationService {
     return user;
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     const user = await this.userService.getById(id);
     if (!user) {
       throw new HttpException(401, 'User not found');
@@ -50,7 +50,7 @@ export class AuthenticationService {
 
   async getRefreshToken(token: string) {
     const storedToken = (
-      await this.db.select().from(refreshTokensTable).where(eq(refreshTokensTable.token, token))
+      await this.db.select().from(usersSessionsTable).where(eq(usersSessionsTable.token, token))
     ).pop();
 
     if (!storedToken) {
@@ -66,7 +66,7 @@ export class AuthenticationService {
   }
 
   async killToken(token: string) {
-    await this.db.delete(refreshTokensTable).where(eq(refreshTokensTable.token, token));
+    await this.db.delete(usersSessionsTable).where(eq(usersSessionsTable.token, token));
   }
 
   async getAuthenticatedUser(signInData: SignInDto) {
@@ -75,7 +75,7 @@ export class AuthenticationService {
     return user;
   }
 
-  async createRefreshToken(userId: number, email: string, currentRefreshToken?: string) {
+  async createRefreshToken(userId: string, email: string, currentRefreshToken?: string) {
     if (currentRefreshToken) {
       this.killToken(currentRefreshToken);
     }
@@ -88,7 +88,7 @@ export class AuthenticationService {
     const expiresAt = new Date();
     expiresAt.setMilliseconds(expiresAt.getMilliseconds() + Number(env.jwt.refreshExpirationTime));
 
-    await this.db.insert(refreshTokensTable).values({ userId, token: refreshToken, expiresAt });
+    await this.db.insert(usersSessionsTable).values({ userId, token: refreshToken, expiresAt });
 
     return {
       refreshToken,
@@ -96,7 +96,7 @@ export class AuthenticationService {
     };
   }
 
-  createAccessToken(userId: number, email: string) {
+  createAccessToken(userId: string, email: string) {
     const payload: JwtPayload = { userId, email };
     const accessToken = jwt.sign(payload, env.jwt.accessSecretKey, {
       expiresIn: env.jwt.accessExpirationTime,
