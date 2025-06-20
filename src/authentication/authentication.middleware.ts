@@ -1,6 +1,4 @@
 import type { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import env from '../common/config/env.config';
 import type { AuthenticationService } from './authentication.service';
 
 export class AuthenticationMiddleware {
@@ -14,9 +12,8 @@ export class AuthenticationMiddleware {
     }
 
     try {
-      res.locals.jwt = jwt.verify(refreshToken, env.jwt.refreshSecretKey);
       await this.authService.getRefreshToken(refreshToken);
-      const user = await this.authService.getUserByEmail(res.locals.jwt.email);
+      const user = await this.authService.getUserByRefreshToken(refreshToken);
 
       req.body.user = {
         userId: user.id,
@@ -44,8 +41,7 @@ export class AuthenticationMiddleware {
       return;
     }
     try {
-      res.locals.jwt = jwt.verify(credential, env.jwt.accessSecretKey);
-      const user = await this.authService.getUserByEmail(res.locals.jwt.email);
+      const user = await this.authService.getUserByAccessToken(credential);
 
       req.body.user = {
         userId: user.id,

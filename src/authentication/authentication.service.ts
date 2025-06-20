@@ -24,22 +24,6 @@ export class AuthenticationService {
     }
   }
 
-  async getUserByEmail(email: string) {
-    const user = await this.userService.getByEmail(email);
-    if (!user) {
-      throw new HttpException(401, 'Wrong credentials');
-    }
-    return user;
-  }
-
-  async getUserById(id: string) {
-    const user = await this.userService.getById(id);
-    if (!user) {
-      throw new HttpException(401, 'User not found');
-    }
-    return user;
-  }
-
   async signUp({ email, password }: SignUpDto) {
     const hashedPassword = await bcrypt.hash(password, env.saltRounds);
     return this.userService.create({
@@ -65,14 +49,36 @@ export class AuthenticationService {
     return storedToken;
   }
 
+  async getUserByAccessToken(accessToken: string) {
+    try {
+      const jwtDecoded = jwt.verify(accessToken, env.jwt.accessSecretKey) as JwtPayload;
+      return await this.userService.getByEmail(jwtDecoded.email);
+    } catch (error) {
+      throw new HttpException(401, 'Invalid or expired access token');
+    }
+  }
+
+  async getUserByRefreshToken(refreshToken: string) {
+    try {
+      const jwtDecoded = jwt.verify(refreshToken, env.jwt.refreshSecretKey) as JwtPayload;
+      return await this.userService.getByEmail(jwtDecoded.email);
+    } catch (error) {
+      throw new HttpException(401, 'Invalid or expired access token');
+    }
+  }
+
   async killToken(token: string) {
     await this.db.delete(usersSessionsTable).where(eq(usersSessionsTable.token, token));
   }
 
   async getAuthenticatedUser(signInData: SignInDto) {
-    const user = await this.getUserByEmail(signInData.email);
-    await this.verifyUserPassword(signInData.password, user.password);
-    return user;
+    try {
+      const user = await this.userService.getByEmail(signInData.email);
+      await this.verifyUserPassword(signInData.password, user.password);
+      return user;
+    } catch (error) {
+      throw new HttpException(401, 'Wrong credentials');
+    }
   }
 
   async createRefreshToken(userId: string, email: string, currentRefreshToken?: string) {

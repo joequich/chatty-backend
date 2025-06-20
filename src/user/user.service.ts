@@ -3,6 +3,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { type databaseSchema, usersTable } from '../database/database.schema';
 import { DrizzleService } from '../database/drizzle.service';
 import { generateRandomString } from '../utils/generate-random';
+import { HttpException } from '../utils/http-exception';
 import type { CreateUserDto } from './schemas/user.dto';
 
 export class UserService {
@@ -38,17 +39,17 @@ export class UserService {
       const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.id, id) });
       return user;
     } catch {
-      throw new Error('Some error while reading user by id');
+      throw new HttpException(404, 'User with this id not found');
     }
   }
 
   async getByEmail(email: string) {
-    try {
-      const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.email, email) });
+    const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.email, email) });
+    if (user) {
       return user;
-    } catch {
-      throw new Error('Some error while reading user email credencial');
     }
+
+    throw new HttpException(404, 'User with this email not found');
   }
 
   async create(user: CreateUserDto) {
