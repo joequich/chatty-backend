@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from 'express';
-import env from '../common/config/env.config';
 import type { AuthenticationService } from './authentication.service';
 
 export class AuthenticationController {
@@ -35,7 +34,7 @@ export class AuthenticationController {
   refreshToken = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const currentRefreshToken = req.cookies?.refreshToken;
-      const { userId, email, username } = req.body.user;
+      const { userId, email } = req.body.user;
       const { refreshTokenExpiration, refreshToken } = await this.authenticationService.createRefreshToken(
         userId,
         email,

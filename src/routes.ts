@@ -1,10 +1,20 @@
 import { Router } from 'express';
-import authenticationRoutes from './authentication/authentication.routes';
+import authRoutes from './authentication/authentication.routes';
+import type { EnvConfig } from './common/config/env.config';
+import type { DrizzleService } from './database/drizzle.service';
 import userRoutes from './user/user.routes';
 
-const router = Router();
+const setupApiRoutes = (env: EnvConfig, drizzleService: DrizzleService): Router => {
+  const router = Router();
 
-router.use('/users', userRoutes);
-router.use('/authentication', authenticationRoutes);
+  router.use('/authentication', authRoutes(env, drizzleService));
+  router.use('/users', userRoutes(env, drizzleService));
 
-export default router;
+  router.get('/', (req, res) => {
+    res.json({ message: 'CHAT API' });
+  });
+
+  return router;
+};
+
+export default setupApiRoutes;

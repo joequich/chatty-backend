@@ -1,16 +1,15 @@
 import { eq } from 'drizzle-orm';
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
-import { type databaseSchema, usersTable } from '../database/database.schema';
-import { DrizzleService } from '../database/drizzle.service';
+import { usersTable } from '../database/database.schema';
+import type { Database, DrizzleService } from '../database/drizzle.service';
 import { generateRandomString } from '../utils/generate-random';
 import { HttpException } from '../utils/http-exception';
 import type { CreateUserDto } from './schemas/user.dto';
 
 export class UserService {
-  private db: NodePgDatabase<typeof databaseSchema>;
+  private db: Database;
 
-  constructor() {
-    this.db = DrizzleService.getInstance().getDb();
+  constructor(private readonly drizzleService: DrizzleService) {
+    this.db = this.drizzleService.getDb();
   }
 
   private async generateUniqueUsername() {

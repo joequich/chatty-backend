@@ -1,20 +1,22 @@
 import bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import jwt, { type SignOptions } from 'jsonwebtoken';
-import env from '../common/config/env.config';
-import { type databaseSchema, usersSessionsTable } from '../database/database.schema';
-import { DrizzleService } from '../database/drizzle.service';
+import type { EnvConfig } from '../common/config/env.config';
+import { usersSessionsTable } from '../database/database.schema';
+import type { Database, DrizzleService } from '../database/drizzle.service';
 import type { UserService } from '../user/user.service';
 import { HttpException } from '../utils/http-exception';
 import type { JwtPayload } from './interfaces/jwt.interface';
 import type { SignInDto, SignUpDto } from './schemas/authentication.dto';
 
 export class AuthenticationService {
-  private db: NodePgDatabase<typeof databaseSchema>;
-
-  constructor(private readonly userService: UserService) {
-    this.db = DrizzleService.getInstance().getDb();
+  private db: Database;
+  constructor(
+    private readonly env: EnvConfig,
+    private readonly drizzleService: DrizzleService,
+    private readonly userService: UserService,
+  ) {
+    this.db = this.drizzleService.getDb();
   }
 
   private async verifyUserPassword(password: string, hashedPassword: string) {
@@ -25,7 +27,7 @@ export class AuthenticationService {
   }
 
   async signUp({ email, password }: SignUpDto) {
-    const hashedPassword = await bcrypt.hash(password, env.saltRounds);
+    const hashedPassword = await bcrypt.hash(password, this.env.saltRounds);
     return this.userService.create({
       email,
       password: hashedPassword,
@@ -51,7 +53,7 @@ export class AuthenticationService {
 
   async getUserByAccessToken(accessToken: string) {
     try {
-      const jwtDecoded = jwt.verify(accessToken, env.jwt.accessSecretKey) as JwtPayload;
+      const jwtDecoded = jwt.verify(accessToken, this.env.jwt.accessSecretKey) as JwtPayload;
       return await this.userService.getByEmail(jwtDecoded.email);
     } catch (error) {
       throw new HttpException(401, 'Invalid or expired access token');
@@ -60,7 +62,7 @@ export class AuthenticationService {
 
   async getUserByRefreshToken(refreshToken: string) {
     try {
-      const jwtDecoded = jwt.verify(refreshToken, env.jwt.refreshSecretKey) as JwtPayload;
+      const jwtDecoded = jwt.verify(refreshToken, this.env.jwt.refreshSecretKey) as JwtPayload;
       return await this.userService.getByEmail(jwtDecoded.email);
     } catch (error) {
       throw new HttpException(401, 'Invalid or expired access token');
@@ -87,30 +89,30 @@ export class AuthenticationService {
     }
     const payload: JwtPayload = { userId, email };
 
-    const refreshToken = jwt.sign(payload, env.jwt.refreshSecretKey, {
-      expiresIn: env.jwt.refreshExpirationTime,
+    const refreshToken = jwt.sign(payload, this.env.jwt.refreshSecretKey, {
+      expiresIn: this.env.jwt.refreshExpirationTime,
     } as SignOptions);
 
     const expiresAt = new Date();
-    expiresAt.setMilliseconds(expiresAt.getMilliseconds() + Number(env.jwt.refreshExpirationTime));
+    expiresAt.setMilliseconds(expiresAt.getMilliseconds() + Number(this.env.jwt.refreshExpirationTime));
 
     await this.db.insert(usersSessionsTable).values({ userId, token: refreshToken, expiresAt });
 
     return {
       refreshToken,
-      refreshTokenExpiration: Number(env.jwt.refreshExpirationTime),
+      refreshTokenExpiration: Number(this.env.jwt.refreshExpirationTime),
     };
   }
 
   createAccessToken(userId: string, email: string) {
     const payload: JwtPayload = { userId, email };
-    const accessToken = jwt.sign(payload, env.jwt.accessSecretKey, {
-      expiresIn: env.jwt.accessExpirationTime,
+    const accessToken = jwt.sign(payload, this.env.jwt.accessSecretKey, {
+      expiresIn: this.env.jwt.accessExpirationTime,
     } as SignOptions);
 
     return {
       accessToken,
-      accessTokenExpiration: Number(env.jwt.accessExpirationTime),
+      accessTokenExpiration: Number(this.env.jwt.accessExpirationTime),
     };
   }
 }

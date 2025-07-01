@@ -1,37 +1,58 @@
 import { type NodePgDatabase, drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import env from '../common/config/env.config';
+import type { EnvConfig } from '../common/config/env.config';
 import { databaseSchema } from './database.schema';
+
+export type Database = NodePgDatabase<typeof databaseSchema>;
 
 export class DrizzleService {
   private static instance: DrizzleService;
   private pool: Pool;
-  private db: NodePgDatabase<typeof databaseSchema>;
+  private db: Database;
+  private isInitialized = false;
 
-  private constructor() {
+  constructor(private readonly env: EnvConfig) {
+    this.pool = new Pool({ connectionString: this.env.dbUrl });
+    this.db = drizzle(this.pool, { schema: databaseSchema });
+  }
+
+  public async connect(): Promise<void> {
+    if (this.isInitialized) {
+      console.log('Drizzle pool is already connected');
+      return;
+    }
+
     try {
-      this.pool = new Pool({ connectionString: env.dbUrl });
-
-      this.pool.on('error', (err) => {
-        console.error('Database connection error:', err.message);
-      });
-
-      this.db = drizzle(this.pool, { schema: databaseSchema });
-      console.log('Database connected');
+      await this.pool.query('SELECT 1');
+      this.isInitialized = true;
+      console.log('Drizzle connected successfully to database');
     } catch (error) {
-      console.error('Error initializing database:', error);
-      throw new Error('Failed to connect to the database');
+      this.isInitialized = false;
+      console.error('Failed to connect to database', error);
+      await this.pool.end();
+      throw error;
     }
   }
 
-  static getInstance(): DrizzleService {
-    if (!DrizzleService.instance) {
-      DrizzleService.instance = new DrizzleService();
+  public async disconnect(): Promise<void> {
+    if (this.isInitialized) {
+      try {
+        await this.pool.end();
+        this.isInitialized = false;
+        console.log('Drizzle pool disconnected');
+      } catch (error) {
+        console.error('Error disconnecting Drizzle pool', error);
+        throw error;
+      }
+    } else {
+      console.log('Drizzle pool not initialized or already disconnected.');
     }
-    return DrizzleService.instance;
   }
 
-  getDb(): NodePgDatabase<typeof databaseSchema> {
+  public getDb(): Database {
+    if (!this.isInitialized) {
+      throw new Error('Drizzle database is not initialized. Call connect() first');
+    }
     return this.db;
   }
 }
