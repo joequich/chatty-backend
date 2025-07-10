@@ -22,7 +22,7 @@ const usersSessionsTable = pgTable('users_sessions', {
 
 const messagesTable = pgTable('messages', {
   id: uuid().primaryKey().defaultRandom(),
-  userId: uuid('user_id')
+  senderId: uuid('sender_id')
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
   content: text().notNull(),

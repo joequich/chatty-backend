@@ -4,12 +4,11 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express, { type Application } from 'express';
 import morgan from 'morgan';
-import { Server as SocketServer } from 'socket.io';
-import { initializeGateways } from './bootstrap';
 import corsConfig from './common/config/cors.config';
 import env, { type EnvConfig } from './common/config/env.config';
 import type { DrizzleService } from './database/drizzle.service';
 import setupApiRoutes from './routes';
+import { SocketManager } from './sockets/socket.manager';
 
 export class App {
   private app: Application;
@@ -47,11 +46,8 @@ export class App {
   }
 
   private setupSocketIO() {
-    const io = new SocketServer(this.server, {
-      cors: corsConfig,
-    });
-
-    initializeGateways(this.env, this.drizzleService, io);
+    const socketManager = new SocketManager(this.env, this.server, this.drizzleService);
+    socketManager.initialize();
   }
 
   private setupProcessEvents(): void {
