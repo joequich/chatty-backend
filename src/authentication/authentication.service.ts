@@ -36,7 +36,10 @@ export class AuthenticationService {
 
   async getRefreshToken(token: string) {
     const storedToken = (
-      await this.db.select().from(usersSessionsTable).where(eq(usersSessionsTable.token, token))
+      await this.db
+        .select()
+        .from(usersSessionsTable)
+        .where(eq(usersSessionsTable.token, token))
     ).pop();
 
     if (!storedToken) {
@@ -53,7 +56,10 @@ export class AuthenticationService {
 
   async getUserByAccessToken(accessToken: string) {
     try {
-      const jwtDecoded = jwt.verify(accessToken, this.env.jwt.accessSecretKey) as JwtPayload;
+      const jwtDecoded = jwt.verify(
+        accessToken,
+        this.env.jwt.accessSecretKey,
+      ) as JwtPayload;
       return await this.userService.getByEmail(jwtDecoded.email);
     } catch (error) {
       throw new HttpException(401, 'Invalid or expired access token');
@@ -62,7 +68,10 @@ export class AuthenticationService {
 
   async getUserByRefreshToken(refreshToken: string) {
     try {
-      const jwtDecoded = jwt.verify(refreshToken, this.env.jwt.refreshSecretKey) as JwtPayload;
+      const jwtDecoded = jwt.verify(
+        refreshToken,
+        this.env.jwt.refreshSecretKey,
+      ) as JwtPayload;
       return await this.userService.getByEmail(jwtDecoded.email);
     } catch (error) {
       throw new HttpException(401, 'Invalid or expired access token');
@@ -70,7 +79,9 @@ export class AuthenticationService {
   }
 
   async killToken(token: string) {
-    await this.db.delete(usersSessionsTable).where(eq(usersSessionsTable.token, token));
+    await this.db
+      .delete(usersSessionsTable)
+      .where(eq(usersSessionsTable.token, token));
   }
 
   async getAuthenticatedUser(signInData: SignInDto) {
@@ -83,7 +94,11 @@ export class AuthenticationService {
     }
   }
 
-  async createRefreshToken(userId: string, email: string, currentRefreshToken?: string) {
+  async createRefreshToken(
+    userId: string,
+    email: string,
+    currentRefreshToken?: string,
+  ) {
     if (currentRefreshToken) {
       this.killToken(currentRefreshToken);
     }
@@ -94,9 +109,13 @@ export class AuthenticationService {
     } as SignOptions);
 
     const expiresAt = new Date();
-    expiresAt.setMilliseconds(expiresAt.getMilliseconds() + Number(this.env.jwt.refreshExpirationTime));
+    expiresAt.setMilliseconds(
+      expiresAt.getMilliseconds() + Number(this.env.jwt.refreshExpirationTime),
+    );
 
-    await this.db.insert(usersSessionsTable).values({ userId, token: refreshToken, expiresAt });
+    await this.db
+      .insert(usersSessionsTable)
+      .values({ userId, token: refreshToken, expiresAt });
 
     return {
       refreshToken,

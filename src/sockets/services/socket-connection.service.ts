@@ -23,6 +23,9 @@ export class SocketConnectionService {
   }
 
   public isUserOnline(userId: string): boolean {
-    return this.userSocketMap.has(userId) && (this.userSocketMap.get(userId)?.size || 0) > 0;
+    return (
+      this.userSocketMap.has(userId) &&
+      (this.userSocketMap.get(userId)?.size || 0) > 0
+    );
   }
 }

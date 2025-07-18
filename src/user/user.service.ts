@@ -35,7 +35,9 @@ export class UserService {
 
   async getById(id: string) {
     try {
-      const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.id, id) });
+      const user = await this.db.query.usersTable.findFirst({
+        where: eq(usersTable.id, id),
+      });
       return user;
     } catch {
       throw new HttpException(404, 'User with this id not found');
@@ -43,7 +45,9 @@ export class UserService {
   }
 
   async getByEmail(email: string) {
-    const user = await this.db.query.usersTable.findFirst({ where: eq(usersTable.email, email) });
+    const user = await this.db.query.usersTable.findFirst({
+      where: eq(usersTable.email, email),
+    });
     if (user) {
       return user;
     }

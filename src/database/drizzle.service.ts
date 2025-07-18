@@ -51,7 +51,9 @@ export class DrizzleService {
 
   public getDb(): Database {
     if (!this.isInitialized) {
-      throw new Error('Drizzle database is not initialized. Call connect() first');
+      throw new Error(
+        'Drizzle database is not initialized. Call connect() first',
+      );
     }
     return this.db;
   }

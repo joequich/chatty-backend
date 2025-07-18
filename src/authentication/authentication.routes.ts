@@ -12,14 +12,30 @@ const authRoutes = (env: EnvConfig, drizzleService: DrizzleService): Router => {
   const router = Router();
 
   const userService = new UserService(drizzleService);
-  const authService = new AuthenticationService(env, drizzleService, userService);
+  const authService = new AuthenticationService(
+    env,
+    drizzleService,
+    userService,
+  );
   const authController = new AuthenticationController(authService);
   const authMiddleware = new AuthenticationMiddleware(authService);
 
-  router.post('/sign-up', validateFields(signUpSchema, 'body'), authController.signUp);
-  router.post('/sign-in', validateFields(signInSchema, 'body'), authController.signIn);
+  router.post(
+    '/sign-up',
+    validateFields(signUpSchema, 'body'),
+    authController.signUp,
+  );
+  router.post(
+    '/sign-in',
+    validateFields(signInSchema, 'body'),
+    authController.signIn,
+  );
   router.post('/sign-out', authController.signOut);
-  router.post('/refresh', authMiddleware.validateRefreshToken, authController.refreshToken);
+  router.post(
+    '/refresh',
+    authMiddleware.validateRefreshToken,
+    authController.refreshToken,
+  );
 
   return router;
 };

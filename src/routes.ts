@@ -4,7 +4,10 @@ import type { EnvConfig } from './common/config/env.config';
 import type { DrizzleService } from './database/drizzle.service';
 import userRoutes from './user/user.routes';
 
-const setupApiRoutes = (env: EnvConfig, drizzleService: DrizzleService): Router => {
+const setupApiRoutes = (
+  env: EnvConfig,
+  drizzleService: DrizzleService,
+): Router => {
   const router = Router();
 
   router.use('/authentication', authRoutes(env, drizzleService));

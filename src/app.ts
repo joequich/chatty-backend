@@ -46,7 +46,11 @@ export class App {
   }
 
   private setupSocketIO() {
-    const socketManager = new SocketManager(this.env, this.server, this.drizzleService);
+    const socketManager = new SocketManager(
+      this.env,
+      this.server,
+      this.drizzleService,
+    );
     socketManager.initialize();
   }
 
