@@ -30,23 +30,11 @@ export class SocketManager {
     });
 
     this.userService = new UserService(this.drizzleService);
-    this.authService = new AuthenticationService(
-      this.env,
-      this.drizzleService,
-      this.userService,
-    );
+    this.authService = new AuthenticationService(this.env, this.drizzleService, this.userService);
     this.messageService = new MessageService(this.drizzleService);
     this.socketConnectionService = new SocketConnectionService();
-    this.socketPresenceService = new SocketPresenceService(
-      this.io,
-      this.socketConnectionService,
-      this.userService,
-    );
-    this.chatSocketController = new ChatSocketController(
-      this.io,
-      this.socketPresenceService,
-      this.messageService,
-    );
+    this.socketPresenceService = new SocketPresenceService(this.io, this.socketConnectionService, this.userService);
+    this.chatSocketController = new ChatSocketController(this.io, this.socketPresenceService, this.messageService);
   }
 
   public async initialize() {
@@ -63,9 +51,7 @@ export class SocketManager {
       this.chatSocketController.registerListeners(socket);
 
       socket.on('disconnect', (reason: string) => {
-        console.log(
-          `User disconnected: ${user.username}, Socket ID: ${socket.id} - reason: ${reason}`,
-        );
+        console.log(`User disconnected: ${user.username}, Socket ID: ${socket.id} - reason: ${reason}`);
         this.socketConnectionService.removeSocket(user.id, socket.id);
         this.socketPresenceService.handleUserOffline(user.id);
       });

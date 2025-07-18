@@ -15,14 +15,9 @@ export class AuthenticationController {
 
   signIn = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { id, email, username } =
-        await this.authenticationService.getAuthenticatedUser(req.body);
-      const { refreshTokenExpiration, refreshToken } =
-        await this.authenticationService.createRefreshToken(id, email);
-      const { accessToken } = this.authenticationService.createAccessToken(
-        id,
-        email,
-      );
+      const { id, email, username } = await this.authenticationService.getAuthenticatedUser(req.body);
+      const { refreshTokenExpiration, refreshToken } = await this.authenticationService.createRefreshToken(id, email);
+      const { accessToken } = this.authenticationService.createAccessToken(id, email);
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
@@ -30,10 +25,7 @@ export class AuthenticationController {
         sameSite: 'strict',
         // secure: env.nodeEnv === 'production'
       });
-      res.status(201).json({
-        success: true,
-        data: { access_token: accessToken, user: { id, email, username } },
-      });
+      res.status(201).json({ success: true, data: { access_token: accessToken, user: { id, email, username } } });
     } catch (error) {
       next(error);
     }
@@ -43,16 +35,12 @@ export class AuthenticationController {
     try {
       const currentRefreshToken = req.cookies?.refreshToken;
       const { userId, email } = req.body.user;
-      const { refreshTokenExpiration, refreshToken } =
-        await this.authenticationService.createRefreshToken(
-          userId,
-          email,
-          currentRefreshToken,
-        );
-      const { accessToken } = this.authenticationService.createAccessToken(
+      const { refreshTokenExpiration, refreshToken } = await this.authenticationService.createRefreshToken(
         userId,
         email,
+        currentRefreshToken,
       );
+      const { accessToken } = this.authenticationService.createAccessToken(userId, email);
 
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
@@ -60,9 +48,7 @@ export class AuthenticationController {
         sameSite: 'strict',
         // secure: env.nodeEnv === 'production'
       });
-      res
-        .status(201)
-        .json({ success: true, data: { access_token: accessToken } });
+      res.status(201).json({ success: true, data: { access_token: accessToken } });
     } catch (error) {
       next(error);
     }

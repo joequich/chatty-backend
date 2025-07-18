@@ -10,13 +10,7 @@ export const validateFields =
     const result = schema.safeParse(req[source]);
 
     if (!result.success) {
-      return next(
-        new BadRequestException(
-          'Invalid request data',
-          'INVALID_REQUEST_DATA',
-          result.error.flatten(),
-        ),
-      );
+      return next(new BadRequestException('Invalid request data', 'INVALID_REQUEST_DATA', result.error.flatten()));
     }
 
     req[source] = result.data;

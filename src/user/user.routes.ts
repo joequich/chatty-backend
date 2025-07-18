@@ -11,11 +11,7 @@ const userRoutes = (env: EnvConfig, drizzleService: DrizzleService): Router => {
 
   const userService = new UserService(drizzleService);
   const userController = new UserController(userService);
-  const authService = new AuthenticationService(
-    env,
-    drizzleService,
-    userService,
-  );
+  const authService = new AuthenticationService(env, drizzleService, userService);
   const authMiddleware = new AuthenticationMiddleware(authService);
 
   router.get('/me', authMiddleware.validateJwt, userController.getById);

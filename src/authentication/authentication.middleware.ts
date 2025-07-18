@@ -4,11 +4,7 @@ import type { AuthenticationService } from './authentication.service';
 export class AuthenticationMiddleware {
   constructor(private readonly authService: AuthenticationService) {}
 
-  validateRefreshToken = async (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => {
+  validateRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
     const refreshToken = req.cookies?.refreshToken;
     if (!refreshToken) {
       res.status(401).json({ message: 'No refresh token was found' });
@@ -26,9 +22,7 @@ export class AuthenticationMiddleware {
       };
       return next();
     } catch (error) {
-      res
-        .status(401)
-        .json({ message: 'Invalid or expired access token. Access denied' });
+      res.status(401).json({ message: 'Invalid or expired access token. Access denied' });
     }
   };
 
@@ -56,9 +50,7 @@ export class AuthenticationMiddleware {
       };
       return next();
     } catch (error) {
-      res
-        .status(401)
-        .json({ message: 'Invalid or expired access token. Access denied' });
+      res.status(401).json({ message: 'Invalid or expired access token. Access denied' });
     }
   };
 }

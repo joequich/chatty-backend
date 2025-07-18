@@ -26,10 +26,7 @@ export interface EnvConfig {
 
 const { env } = minimist(process.argv.slice(2));
 
-const pathFile = path.resolve(
-  __dirname,
-  `../../../.env${env ? `.${env}` : ''}`,
-);
+const pathFile = path.resolve(__dirname, `../../../.env${env ? `.${env}` : ''}`);
 
 if (fs.existsSync(pathFile)) {
   const envFound = config({ path: pathFile });
@@ -38,9 +35,7 @@ if (fs.existsSync(pathFile)) {
     throw new Error(`Error loading env file at ${pathFile}`);
   }
 } else {
-  console.warn(
-    `Couldn't find .env file at ${pathFile}. process.env will be used directly.`,
-  );
+  console.warn(`Couldn't find .env file at ${pathFile}. process.env will be used directly.`);
 }
 
 const envConfig: EnvConfig = {

@@ -16,10 +16,7 @@ export class SocketPresenceService {
       this.onlineUsers.set(userId, true);
       const user = await this.userService.getById(userId);
       if (user) {
-        this.io.emit('presence:user_online', {
-          userId: user.id,
-          username: user.username,
-        });
+        this.io.emit('presence:user_online', { userId: user.id, username: user.username });
       }
     }
   }
@@ -29,10 +26,7 @@ export class SocketPresenceService {
       this.onlineUsers.set(userId, false);
       const user = await this.userService.getById(userId);
       if (user) {
-        this.io.emit('presence:user_offline', {
-          userId: user.id,
-          username: user.username,
-        });
+        this.io.emit('presence:user_offline', { userId: user.id, username: user.username });
       }
     }
   }
