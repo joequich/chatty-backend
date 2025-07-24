@@ -1,5 +1,5 @@
 {
-  "id": "2d6a72e4-0dc0-4245-ad0e-ef39f3750581",
+  "id": "28f60e13-ea35-4e52-a574-c1f4245811b8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -27,15 +27,31 @@
           "primaryKey": false,
           "notNull": true
         },
-        "sent_at": {
-          "name": "sent_at",
-          "type": "timestamp",
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "created_at_idx": {
+          "name": "created_at_idx",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "messages_sender_id_users_id_fk": {
           "name": "messages_sender_id_users_id_fk",
@@ -78,13 +94,13 @@
         },
         "expires_at": {
           "name": "expires_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
@@ -145,21 +161,21 @@
         },
         "created_at": {
           "name": "created_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false,
           "default": "now()"
         },
         "last_seen_at": {
           "name": "last_seen_at",
-          "type": "timestamp",
+          "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
         }

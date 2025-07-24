@@ -1,13 +1,13 @@
-import { pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { index, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 const usersTable = pgTable('users', {
   id: uuid().primaryKey().defaultRandom(),
   username: varchar({ length: 50 }).unique().notNull(),
   email: varchar({ length: 100 }).notNull().unique(),
   password: varchar({ length: 255 }).notNull().unique(),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow(),
-  lastSeenAt: timestamp('last_seen_at'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }),
 });
 
 const usersSessionsTable = pgTable('users_sessions', {
@@ -16,18 +16,22 @@ const usersSessionsTable = pgTable('users_sessions', {
     .notNull()
     .references(() => usersTable.id, { onDelete: 'cascade' }),
   token: varchar('token', { length: 255 }).notNull().unique(),
-  expiresAt: timestamp('expires_at').notNull(),
-  createdAt: timestamp('created_at').defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
 });
 
-const messagesTable = pgTable('messages', {
-  id: uuid().primaryKey().defaultRandom(),
-  senderId: uuid('sender_id')
-    .notNull()
-    .references(() => usersTable.id, { onDelete: 'cascade' }),
-  content: text().notNull(),
-  sentAt: timestamp('sent_at').defaultNow(),
-});
+const messagesTable = pgTable(
+  'messages',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    senderId: uuid('sender_id')
+      .notNull()
+      .references(() => usersTable.id, { onDelete: 'cascade' }),
+    content: text().notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  },
+  (table) => [index('created_at_idx').on(table.createdAt)],
+);
 
 export const databaseSchema = {
   usersTable,
