@@ -6,6 +6,7 @@ import express, { type Application } from 'express';
 import morgan from 'morgan';
 import corsConfig from './common/config/cors.config';
 import env, { type EnvConfig } from './common/config/env.config';
+import { errorHandler } from './common/middlewares/error-handler.middleware';
 import type { DrizzleService } from './database/drizzle.service';
 import setupApiRoutes from './routes';
 import { SocketManager } from './sockets/socket.manager';
@@ -43,6 +44,7 @@ export class App {
     this.app.get('/', (req, res) => {
       res.send('OK');
     });
+    this.app.use(errorHandler);
   }
 
   private setupSocketIO() {
