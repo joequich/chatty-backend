@@ -1,7 +1,8 @@
-import { lt } from 'drizzle-orm';
+import { desc, lt } from 'drizzle-orm';
 import { messagesTable } from '../database/database.schema';
 import type { Database, DrizzleService } from '../database/drizzle.service';
 import type { CreateMessageDto, Message } from './schemas/message.dto';
+import type { GetMessageHistory } from './schemas/message.schema';
 
 export class MessageService {
   private db: Database;
@@ -9,15 +10,19 @@ export class MessageService {
     this.db = this.drizzleService.getDb();
   }
 
-  async getHistory(before?: Date, limit = 20): Promise<Message[]> {
+  async getHistory(limit: number, cursor?: Date): Promise<GetMessageHistory> {
     const history = await this.db
       .select()
       .from(messagesTable)
-      .where(before ? lt(messagesTable.createdAt, before) : undefined)
-      .orderBy(messagesTable.createdAt)
-      .limit(limit);
+      .where(cursor ? lt(messagesTable.createdAt, cursor) : undefined)
+      .orderBy(desc(messagesTable.createdAt))
+      .limit(limit + 1);
 
-    return history;
+    const hasMore = history.length > limit;
+    const messages = hasMore ? history.slice(0, -1) : history;
+    const nextCursor = hasMore ? messages[messages.length - 1].createdAt.toISOString() : null;
+
+    return { messages, pagination: { hasMore, nextCursor } };
   }
 
   async createMessage(data: CreateMessageDto): Promise<Message> {

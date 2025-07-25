@@ -8,6 +8,13 @@
       "when": 1753326127515,
       "tag": "0000_puzzling_morg",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753402011305,
+      "tag": "0001_slow_rocket_racer",
+      "breakpoints": true
     }
   ]
 }
